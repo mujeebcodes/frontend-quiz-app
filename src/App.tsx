@@ -1,9 +1,10 @@
-import StartingPage from "./StartingPage";
+import StartingPage from "./components/StartingPage";
 
 import { useState } from "react";
 import data from "./data.json";
-import Quiz from "./Quiz";
-import QuizCompletion from "./QuizCompletion";
+import Quiz from "./components/Quiz";
+import QuizCompletion from "./components/QuizCompletion";
+import Toggle from "./components/Toggle";
 
 export type QuizType = {
   title: string;
@@ -28,10 +29,19 @@ function App() {
     setIsQuizCompleted(false);
   };
   return (
-    <div className="flex flex-col font-Rubik h-screen bg-light-bg-mobile bg-no-repeat bg-contain p-4">
-      <header>
-        <div>{selectedQuiz && selectedQuiz.title}</div>
-        <div>toggle</div>
+    <div className="min-h-screen container mx-auto p-8 text-blue-gray flex flex-col gap-y-5  font-Rubik h-screen bg-light-bg-mobile bg-no-repeat bg-contain md:bg-light-bg-tablet lg:bg-light-bg-desktop lg:pt-20">
+      <header className="flex justify-between">
+        <div>
+          {selectedQuiz && (
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10">
+                <img src={selectedQuiz.icon} alt={selectedQuiz.title} />
+              </div>
+              <p className="font-bold">{selectedQuiz.title}</p>
+            </div>
+          )}
+        </div>
+        <Toggle />
       </header>
       <main>
         {!selectedTopic && (

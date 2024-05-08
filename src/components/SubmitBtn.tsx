@@ -4,7 +4,11 @@ type Props = {
 };
 const SubmitBtn = ({ onClick: handleSubmit, disabled }: Props) => {
   return (
-    <button onClick={handleSubmit} disabled={disabled}>
+    <button
+      onClick={handleSubmit}
+      disabled={disabled}
+      className="w-full bg-purple p-4 text-white rounded-xl mt-3"
+    >
       Submit Answer
     </button>
   );
