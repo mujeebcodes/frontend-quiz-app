@@ -7,15 +7,23 @@ import Wrong from "./icons/Wrong";
 
 type Props = {
   quiz: QuizType;
+  isDarkMode: boolean;
   setScore: React.Dispatch<number>;
   score: number;
   setIsQuizCompleted: React.Dispatch<boolean>;
 };
-const Quiz = ({ quiz, setScore, score, setIsQuizCompleted }: Props) => {
+const Quiz = ({
+  quiz,
+  setScore,
+  score,
+  setIsQuizCompleted,
+  isDarkMode,
+}: Props) => {
   const [questionNumber, setQuestionNumber] = useState<number>(0);
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number>(-1);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
+  const [cannotSubmit, setCannotSubmit] = useState<boolean>(false);
 
   const questions = quiz.questions;
   const totalQuestions = questions.length;
@@ -33,13 +41,17 @@ const Quiz = ({ quiz, setScore, score, setIsQuizCompleted }: Props) => {
 
   const submitAnswer = () => {
     if (!selectedOption) {
+      setCannotSubmit(true);
       return;
     }
-    if (isCorrectAnswer) {
-      setScore(score + 1);
-    }
 
-    setIsAnswerSubmitted(true);
+    if (!cannotSubmit) {
+      if (isCorrectAnswer) {
+        setScore(score + 1);
+      }
+
+      setIsAnswerSubmitted(true);
+    }
   };
 
   const getNextQuestion = () => {
@@ -55,19 +67,28 @@ const Quiz = ({ quiz, setScore, score, setIsQuizCompleted }: Props) => {
   };
 
   const handleOptionSelect = (option: string, index: number) => {
+    setCannotSubmit(false);
     setSelectedOption(option);
     setSelectedOptionIndex(index);
   };
   return (
-    <section className="flex flex-col gap-10 lg:flex-row">
+    <section
+      className={`flex flex-col gap-10 lg:flex-row ${
+        isDarkMode ? "text-white" : ""
+      }`}
+    >
       <div className="flex flex-col gap-4 lg:w-1/2 lg:gap-14 ">
-        <p>
+        <p className="italic">
           Question {questionNumber + 1} of {totalQuestions}
         </p>
         <h2 className="font-bold lg:text-5xl">
           {questions[questionNumber].question}
         </h2>
-        <div className="bg-white w-full shadow-lg h-4 rounded-lg flex items-center">
+        <div
+          className={`w-full px-1 shadow-lg h-4 rounded-lg flex items-center ${
+            isDarkMode ? "bg-light-maroon" : "bg-white"
+          }`}
+        >
           <div
             className="bg-purple h-1/2 rounded-lg"
             style={{ width: `${progress}%` }}
@@ -75,14 +96,18 @@ const Quiz = ({ quiz, setScore, score, setIsQuizCompleted }: Props) => {
         </div>
       </div>
       <div className="lg:w-1/2">
-        <ul className="flex flex-col gap-4 cursor-pointer">
+        <ul className={`flex flex-col gap-4 cursor-pointer`}>
           {questions[questionNumber].options.map((option, index) => {
             return (
               <li
                 key={option}
                 onClick={() => handleOptionSelect(option, index)}
-                className={`px-4 flex items-center justify-between gap-3 w-full bg-white h-16 rounded-xl shadow-xl ${
-                  selectedOptionIndex === index ? "border-purple border-2" : ""
+                className={`px-4 flex items-center justify-between gap-3 w-full  h-16 rounded-xl shadow-xl ${
+                  isDarkMode ? "bg-light-maroon" : "bg-white"
+                }  ${
+                  !isAnswerSubmitted && selectedOptionIndex === index
+                    ? "border-purple border-2"
+                    : ""
                 } ${
                   isAnswerSubmitted &&
                   isCorrectAnswer &&
@@ -97,22 +122,24 @@ const Quiz = ({ quiz, setScore, score, setIsQuizCompleted }: Props) => {
               >
                 <div className="flex items-center gap-x-2">
                   <span
-                    className={`w-10 h-10 flex items-center justify-center  rounded-md ${
-                      selectedOptionIndex === index
-                        ? " bg-purple text-white"
-                        : "bg-gray-50"
+                    className={`w-10 h-10 flex items-center justify-center  rounded-md 
+                     ${isDarkMode && "text-black"} ${
+                      !isAnswerSubmitted &&
+                      selectedOptionIndex === index &&
+                      "bg-purple text-white"
                     } ${
                       isAnswerSubmitted &&
                       isCorrectAnswer &&
-                      selectedOptionIndex === index
-                        ? "bg-light-green "
-                        : ""
+                      selectedOptionIndex === index &&
+                      "bg-light-green text-white"
                     } ${
                       isAnswerSubmitted &&
                       !isCorrectAnswer &&
                       selectedOptionIndex === index &&
-                      "bg-light-red"
-                    }`}
+                      "bg-light-red text-white"
+                    } ${
+                      !isAnswerSubmitted && !selectedOption && "bg-off-white"
+                    } `}
                   >
                     {letters[index]}
                   </span>
@@ -135,10 +162,15 @@ const Quiz = ({ quiz, setScore, score, setIsQuizCompleted }: Props) => {
         {isAnswerSubmitted ? (
           <NextQuestionBtn onClick={getNextQuestion} />
         ) : (
-          <SubmitBtn onClick={submitAnswer} disabled={!selectedOption} />
+          <SubmitBtn onClick={submitAnswer} />
+        )}
+        {cannotSubmit && (
+          <p className="pt-4 flex justify-center items-center gap-2">
+            <Wrong />
+            <span> Please select an answer</span>
+          </p>
         )}
       </div>
-      <p></p>
     </section>
   );
 };

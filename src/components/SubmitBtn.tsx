@@ -1,13 +1,11 @@
 type Props = {
-  disabled: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
-const SubmitBtn = ({ onClick: handleSubmit, disabled }: Props) => {
+const SubmitBtn = ({ onClick: handleSubmit }: Props) => {
   return (
     <button
       onClick={handleSubmit}
-      disabled={disabled}
-      className="w-full bg-purple p-4 text-white rounded-xl mt-3"
+      className="w-full bg-purple p-4 text-white rounded-xl mt-3 hover:bg-opacity-50"
     >
       Submit Answer
     </button>
